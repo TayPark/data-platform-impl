@@ -13,6 +13,21 @@
 문제점
 - 프로덕션 서비스 DB에 부하(장애 우려)
 
+해결방법
+- 쿼리 엔진과 저장소 분리
+  - 실시간 로그 파이프라인 구축
+    - WAS 가 container application 으로 가정
+    - docker driver 인 `fluentd` 사용 
+      - `K8S` 로 확장할 경우 추가적인 리서치 필요
+    - 뒷단에서 log buffer 역할을 수행할 `Kafka`, `kSQL` 사용
+      - `ksqlDB` 가 `elasticsearch`, `kibana` 를 대체할 수 있다면 적용 시도
+  - 저장하고 있던 로그 저장소 backfill
+    - Dump 필요
+  - SSOT 구축(Data Lake)
+    - `minio` 사용 (Cloud object storage compatiblity)
+  - 쿼리 엔진 구축
+    - `Trino` 사용
+
 ### 1단계
 
 > 상황: 데이터 기반의 의사결정을 위해 데이터 분석이 필요한 상황. 데이터 분석할 도구가 없어 도입 필요
@@ -20,11 +35,7 @@
 **프로덕션 서비스 DB, 로그 스토리지의 데이터를 일일 배치 처리로 가공된 데이터를 조회할 수 있도록 인프라 구축**
 
 - 일일/시간별 배치를 통해 데이터를 가공하여 제공
-  - 분석용도로 더 적절한 데이터 포맷으로 데이터 가공
-    - 서비스 DB는 MySQL / 로그 DB는 MongoDB에 적재하는 것으로 가정
-    - ETL 엔진은 Spark or Flink
-    - DB 데이터를 가져오기 위해 Data extraction? copy? tool 필요
-  - Airflow / Prefect 도입
+  - Workflow manager, Apache Airflow 도입 
 - 데이터 분석 엔진 도입
   - EDA 클러스터 구축(Trino)
 
@@ -38,7 +49,7 @@
 
 **데이터 분석 효율성 - 실시간 데이터를 바로 처리하여 즉시 활용할 수 있도록 인프라 구축**
 
-- Realtime ETL + CDC
+- CDC
 - ETL, EDA 클러스터 오토 스케일링
   - ETL 클러스터의 시스템 리소스의 지속적인 모니터링 필요
     - 효율적인 인스턴스 타입 선택을 위함
