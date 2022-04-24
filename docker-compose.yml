@@ -18,3 +18,5 @@ services:
       - "24224:24224"
     networks:
       - dp
+
+# Kafka setup 필요
