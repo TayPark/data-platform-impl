@@ -1,0 +1,6 @@
+FROM fluent/fluentd:v1.14-1
+
+COPY ./fluent.conf /fluentd/etc/fluent.conf
+VOLUME ./fluentd/logs:/fluentd/log
+
+EXPOSE 24224

@@ -1,0 +1,10 @@
+FROM node:16
+
+WORKDIR /src
+VOLUME ./:/src
+
+EXPOSE 3000
+
+RUN apt-get update && apt-get install netcat-openbsd -y
+
+CMD [ "yarn", "start" ]

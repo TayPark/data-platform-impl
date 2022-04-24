@@ -1,0 +1,39 @@
+version: "3"
+  
+
+networks:
+  dp:
+    driver: bridge
+  was:
+    driver: bridge
+
+services:
+  was:
+    container_name: was
+    build:
+      context: was
+      dockerfile: Dockerfile.server
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./was:/src
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: localhost:24224
+        tag: docker.was.{{.ID}}
+    networks:
+      - was
+
+  fluentd:
+    container_name: fluentd
+    build:
+      context: fluentd
+      dockerfile: Dockerfile.fluentd
+    volumes:
+      - ./fluentd/fluent.conf:/fluentd/etc/fluent.conf
+      - ./fluentd/logs:/fluentd/log
+    ports:
+      - "24224:24224"
+    networks:
+      - dp
