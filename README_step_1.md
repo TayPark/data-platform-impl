@@ -9,3 +9,13 @@
   - [ ] kSQL
   - [ ] (Optional) ksqlDB
     - 만약 ksqlDB 로 쉬운 조회가 가능하고 kibana 에서 query 처럼 쉬운 visualize 가 가능하다면 이 루트로 적용
+
+
+```s
+# fluentd
+$ docker-compose up --build
+
+# WAS 컨테이너 빌드 및 실행
+$ docker build -t dp-impl-was -f ./was/Dockerfile.server ./was
+$ docker run --rm -d --name was -p 3000:3000 --log-driver=fluentd --log-opt fluentd-address=localhost:24224 --log-opt tag=docker.was.{{.ID}} dp-impl-was
+```
