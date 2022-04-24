@@ -13,6 +13,7 @@
 - 데이터 분석 엔진 도입
   - EDA 클러스터 구축(Trino)
 
-[x] WAS 셋업
-  [x] WAS log pipeline
-  [x] Kafka (kSQL?)
+- [ ] WAS
+  -  [ ] WAS log pipeline /w fluentd
+- [ ] ETL Pipeline
+  - [ ] kSQL
