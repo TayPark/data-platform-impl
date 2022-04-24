@@ -8,25 +8,11 @@
 
 ### 0단계
 
-조회쿼리를 돌리려면 현재 있는 데이터베이스에서 집계 쿼리를 돌려야 함
+1. 조회쿼리를 돌리려면 현재 존재하는 데이터베이스에서 집계 쿼리를 돌려야 함
+2. WAS, DB 만 있는 상태
 
 문제점
 - 프로덕션 서비스 DB에 부하(장애 우려)
-
-해결방법
-- 쿼리 엔진과 저장소 분리
-  - 실시간 로그 파이프라인 구축
-    - WAS 가 container application 으로 가정
-    - docker driver 인 `fluentd` 사용 
-      - `K8S` 로 확장할 경우 추가적인 리서치 필요
-    - 뒷단에서 log buffer 역할을 수행할 `Kafka`, `kSQL` 사용
-      - `ksqlDB` 가 `elasticsearch`, `kibana` 를 대체할 수 있다면 적용 시도
-  - 저장하고 있던 로그 저장소 backfill
-    - Dump 필요
-  - SSOT 구축(Data Lake)
-    - `minio` 사용 (Cloud object storage compatiblity)
-  - 쿼리 엔진 구축
-    - `Trino` 사용
 
 ### 1단계
 
@@ -34,10 +20,22 @@
 
 **프로덕션 서비스 DB, 로그 스토리지의 데이터를 일일 배치 처리로 가공된 데이터를 조회할 수 있도록 인프라 구축**
 
-- 일일/시간별 배치를 통해 데이터를 가공하여 제공
-  - Workflow manager, Apache Airflow 도입 
-- 데이터 분석 엔진 도입
-  - EDA 클러스터 구축(Trino)
+- 쿼리 엔진과 저장소 분리
+  - 실시간 로그 파이프라인 구축
+    - WAS 가 container application 으로 가정
+    - docker driver 인 `fluentd` 사용 
+      - `K8S` 로 확장할 경우 추가적인 리서치 필요
+    - 뒷단에서 log buffer 역할을 수행할 `Kafka`, `kSQL` 사용
+      - `ksqlDB` 가 `elasticsearch`, `kibana` 를 대체할 수 있다면 적용 시도
+  - SSOT 구축(Data Lake)
+    - `minio` 사용 (Cloud object storage compatiblity)
+  - 쿼리 엔진 구축
+    - `Trino` 사용
+  - 실시간이 필요하지 않은 데이터는 Workflow manager 로 ingestion
+    - `Apache Airflow` 사용
+  - 저장하고 있던 로그 저장소 backfill
+    - Dump 필요
+
 
 문제점
 - 실시간 데이터 조회 불가능. 무조건 배치 데이터만 조회 가능
