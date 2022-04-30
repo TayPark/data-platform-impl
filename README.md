@@ -42,7 +42,8 @@
 TODO:
 - [x] WAS 구축
 - [x] fluentd 연결
-- [ ] Kafka 연결
+- [x] Kafka 연결
+- [ ] KSQL 붙여서 ETL
 - [ ] minio sink
 
 문제점
