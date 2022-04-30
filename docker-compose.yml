@@ -18,5 +18,57 @@ services:
       - "24224:24224"
     networks:
       - dp
+    depends_on:
+      - kafka
 
-# Kafka setup 필요
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.1.0.arm64
+    hostname: zookeeper
+    container_name: zookeeper
+    networks:
+      - dp
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 3000
+
+  kafka:
+    image: confluentinc/cp-kafka:7.1.0.arm64
+    hostname: kafka
+    container_name: kafka
+    networks:
+      - dp
+    depends_on:
+      - zookeeper
+    ports:
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+
+  # ksqldb-server:
+  #   image: confluentinc/ksqldb-server:0.25.1.arm64
+  #   hostname: ksqldb-server
+  #   container_name: ksqldb-server
+  #   ports:
+  #     - "8088:8088"
+  #   environment:
+  #     KSQL_LISTENERS: http://0.0.0.0:8088
+  #     KSQL_BOOTSTRAP_SERVERS: kafka:29092
+  #     KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: "true"
+  #     KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE: "true"
+
+  # ksqldb-cli:
+  #   image: confluentinc/ksqldb-cli:0.25.1.arm64
+  #   container_name: ksqldb-cli
+  #   depends_on:
+  #     - ksqldb-server
+  #   entrypoint: /bin/sh
+  #   tty: true
